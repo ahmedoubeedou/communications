@@ -1,6 +1,7 @@
-// ===================== import pagehome ===============================
+// ===================== import page ===============================
 import Homepage from "./pagehome/Homepage";
-// ===================== import pagehome ===============================
+import CreatePost from "./posts/CreatePost";
+// ===================== import page ===============================
 //================ user Information ====================================
 import { information } from "./context/Userinformation";
 import { useState } from "react";
@@ -23,6 +24,7 @@ function App() {
     <Routes>
       <Route path="/" element={ <information.Provider value={token}><Homepage getInformation={getInformation}/></information.Provider>} />
       <Route path="/register" element={<RegisterPage/>} />
+      <Route path="/createpost" element={<CreatePost/>}/>
       <Route path="*" element={<NotFound/>}/>
       </Routes>
    </>

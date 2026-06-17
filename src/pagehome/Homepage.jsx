@@ -13,6 +13,9 @@ import Cards from './Cards';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 // ================= photo utilisateur =========================
+// ============================ button add Post ===========================
+import AddIcon from '@mui/icons-material/Add';
+// ============================ button add Post===========================
 // =========================== dialog =========================
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -99,7 +102,7 @@ function LoginCount()
     setToken(response.data.token)
      getInformation(response.data.token);
     setUerInformation(response.data.user);
-    console.log(response.data)
+    // console.log(response.data)
      setInformationLogin({   use:"", pasw : ""})
 })
     }catch(erore)
@@ -120,8 +123,8 @@ setToken("");
 // =================== Lougout ========================
     return (
         <>
-          <Container maxWidth="sm">
-              {/* ============================================== appBar  ======================================  */}
+          <Container maxWidth="sm" >
+              {/* ============================================== debut appBar  ======================================  */}
                  <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{borderRadius:2 , backgroundColor:"#e0e0e0"  ,marginTop:1}}>
         <Toolbar sx={{color:'black' , gap:1 , cursor:"pointer"}}>
@@ -140,12 +143,12 @@ setToken("");
         </Toolbar>
       </AppBar>
     </Box>
-          {/* ============================================== appBar  ======================================  */}
-          {/* ======================== posts =============================================*/}
+          {/* ============================================== fin appBar  ======================================  */}
+          {/* ======================== debut posts =============================================*/}
          {post}
-         {/* ========================= posts =============================================== */}
+         {/* ========================= fin posts =============================================== */}
 
-         {/* ========================================== Diailog ====================================== */}
+         {/* ========================================== debut Diailog ====================================== */}
            <Dialog open={openDialog} onClose={handleCloseDialog} disableRestoreFocus>
         <DialogTitle className='text-center' >Login</DialogTitle>
         <DialogContent>
@@ -192,7 +195,14 @@ setToken("");
           </Button>
         </DialogActions>
       </Dialog>
-               {/* ========================================== Diailog ====================================== */}
+               {/* ========================================== fin Diailog ====================================== */}
+               {/* ========================================== debut Add post ==================================== */}
+               <Link to="/createpost">
+                <div className={`w-12 items-center justify-center h-12 rounded-full bg-blue-700 cursor-pointer fixed bottom-0  right-0  mb-2 mr-1 sm:mb-4 sm:mr-4  hover:bg-blue-600 hover:text-amber-50 text-white transition ${token?"flex":"hidden"}`}>
+                 <AddIcon sx={{color:"while" , fontSize:"38px"}} />
+                </div>
+                </Link>
+                {/* ========================================== fin Add post ==================================== */}
       </Container>
         </>
     )
