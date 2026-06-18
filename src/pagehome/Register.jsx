@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useRef  } from "react";
 import {TextField,Button,CircularProgress, Divider} from "@mui/material";
 import {   HowToRegOutlined} from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -6,6 +6,10 @@ import InputAdornment from '@mui/material/InputAdornment';
 import HttpsIcon from '@mui/icons-material/Https';
 import PersonIcon from '@mui/icons-material/Person';
 import MarkEmailUnreadIcon from '@mui/icons-material/MarkEmailUnread';
+import Container from '@mui/material/Container';
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import LoginIcon from '@mui/icons-material/Login';
+// import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
@@ -51,13 +55,35 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 const [messsage , setMessage ] = useState(false);
+const [entrer , setEntrer ] = useState(false);
 const [messageValide , setMessageValide] = useState("");
+// ======================= phot ==========
+const [preview, setPreview] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef(null);
+ const [urlProfiel , setUrlProfiel] = useState(null);
+  const handleFile = (file) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    const url = URL.createObjectURL(file);
+    
+    setPreview(url);
+    setUrlProfiel(file);
+  };
+ 
+  const handleChangePhoto = (e) => handleFile(e.target.files[0]);
+ 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFile(e.dataTransfer.files[0]);
+  };
+  // ======================== fin ===================
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = "Le nom complet est requis.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Adresse e-mail invalide.";
     if (form.username.length < 3) e.username = "Minimum 3 caractères.";
-    if (form.password.length < 6) e.password = "Minimum 8 caractères.";
+    if (form.password.length < 6) e.password = "Minimum 6 caractères.";
     return e;
   };
 
@@ -78,28 +104,73 @@ const [messageValide , setMessageValide] = useState("");
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
      setLoading(true);
-    await new Promise((r) => setTimeout(r, 3000));
-    
+    await new Promise((r) => setTimeout(r, 2000));
      setLoading(false);
+    setSuccess(true)
+    
     
   };
+  // ========================= counte prais ================
+  if(entrer)
+  {
+    return(
+      <>
+     <Container 
+      maxWidth="sm" 
+      sx={{ 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        height: "100vh",
+       
+        background: "#123" 
+      }}
+    >
+   
+      <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center max-w-xs w-full transform transition-all hover:scale-105 duration-300">
+        <div className="w-16 h-16 bg-[#123] text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+         <LoginIcon sx={{color:"white" , fontSize:"40px"}}/>
+        </div>
+        <h1 className="text-2xl font-extrabold text-gray-800 mb-2 tracking-tight">
+          Bienvenue
+        </h1>
+        <Link to="/">
+        <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold text-lg py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 group">
+          <span>Entrer</span>
+          {/* <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5l6 6m0 0l-6 6m6-6H3" />
+          </svg> */}
+        </button>
+        </Link>
+      </div>
+    </Container>
+      
+      </>
+    );
+  }
+  // ========================= counte prais ================
 //===================== logique =========================
 async function envoyerInformation()
 {
+  console.log(form);
   try{
- let resp = await      axios.post("https://tarmeezacademy.com/api/v1/register",
-{
-    "username":form.username,
-        "name": form.name,
-        "email":form.email,
-        "password":form.password
-}
+    let formDat = new FormData()
+    formDat.append("username",form.username)
+    formDat.append("password",form.password)
+    if(urlProfiel)
+    {
+    formDat.append("image",urlProfiel)
+    }
+
+    formDat.append("name",form.name)
+    formDat.append("email",form.email)
+ let resp =  await      axios.post("https://tarmeezacademy.com/api/v1/register",
+       formDat
        )
         console.log(resp)
         localStorage.setItem("token",resp.data.token)
-     
-        setSuccess(true);
-          
+        localStorage.setItem("user",JSON.stringify(resp.data.user));
+        setEntrer(true);
   }
   catch(error){
 
@@ -108,43 +179,133 @@ async function envoyerInformation()
       console.error("Détails de l'erreur de validation :", error.response.data);
       setMessageValide(error.response.data.message)
       setMessage(true);
+      
     } else {
       console.error("Erreur réseau ou autre :", error.message);
     }
+setSuccess(false)
   }
 
 }
   /* ── Success screen ── */
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white  border border-slate-800 rounded-2xl p-10 flex flex-col items-center text-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-black border border-emerald-500/25 text-white flex items-center justify-center">
-            <AccountCircleIcon sx={{ fontSize: 34, color: "white" }} />
+     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      {/* Ambient glow backdrop */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-600/10 blur-[120px]" />
+        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-emerald-500/5 blur-[100px]" />
+      </div>
+      <div className="relative w-full max-w-md">
+        {/* Card */}
+        <div className="bg-[#f5f5f5] text-black backdrop-blur-xl border border-slate-700/50 rounded-3xl p-10 flex flex-col items-center text-center gap-6 shadow-2xl shadow-black/40">
+ 
+          {/* Success badge */}
+          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-black text-xs font-medium px-3 py-1.5 rounded-full">
+            {/* <CheckCircleOutlineIcon sx={{ fontSize: 14 }} /> */}
+            Compte activé
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-black mb-1">Compte créé !</h2>
-            <p className="text-black text-sm">
-              Bienvenue,{" "}
-              <span className="text-black font-medium">{form.name}</span>. Votre compte est prêt.
+ 
+          {/* Photo upload zone */}
+          <div className="flex flex-col items-center gap-3">
+            {/* Hidden file input */}
+            <input
+              ref={inputRef}
+              id="photo-upload"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleChangePhoto}
+            />
+ 
+            {/* Label acts as the clickable avatar */}
+            <label
+              htmlFor="photo-upload"
+              onDrop={handleDrop}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              className={`
+                relative w-24 h-24 rounded-full cursor-pointer group
+                ring-2 transition-all duration-300
+                ${dragOver
+                  ? "ring-violet-400 scale-105"
+                  : "ring-slate-700 hover:ring-violet-500/60"
+                }
+              `}
+            >
+              {/* Avatar / preview */}
+              {preview ? (
+                <img
+                  src={preview}
+                  alt="Photo de profil"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full rounded-full text-black bg-slate-800 border border-slate-700 flex items-center justify-center">
+                  <AccountCircleIcon sx={{ fontSize: 48, color: "#64748b" }} />
+                </div>
+              )}
+ 
+              {/* Camera overlay on hover */}
+              <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-1">
+                <PhotoCameraIcon sx={{ fontSize: 22, color: "white" }} />
+                <span className="text-black text-[10px] font-medium leading-none">
+                  Modifier
+                </span>
+              </div>
+            </label>
+ 
+            {/* Upload hint */}
+            <p className="text-black text-xs">
+              {preview ? "Cliquez pour changer la photo" : "Ajouter une photo de profil"}
             </p>
           </div>
-          <Link to="/">
-          <Button
-            fullWidth
-            variant="outlined"
+ 
+          {/* Identity */}
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-black tracking-tight">
+              Bienvenue, <span className="text-black">{form?.name ?? "Utilisateur"}</span>
+            </h2>
+            <p className="text-black text-sm leading-relaxed">
+              Votre compte est prêt. Vous pouvez commencer dès maintenant.
+            </p>
+          </div>
+ 
+          {/* Divider */}
+          <div className="w-full h-px bg-slate-800" />
+ 
+          {/* CTA */}
+          <div className="w-full flex flex-col gap-3">
            
-            sx={{
-              mt: 1, borderRadius: "12px", textTransform: "none", fontWeight: 500,
-              borderColor: "rgba(139,92,246,0.35)", color: "#a78bfa",
-              "&:hover": { borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,0.07)" },
-            }}
-          >
-            Entrer
-          </Button>
-          </Link>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={envoyerInformation}
+                sx={{
+                  borderRadius: "14px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  py: 1.4,
+                  background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)",
+                  boxShadow: "0 0 24px rgba(124,58,237,0.35)",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                    boxShadow: "0 0 32px rgba(139,92,246,0.45)",
+                  },
+                }}
+              >
+                Entrer dans l'application
+              </Button>
+         
+ 
+         
+          </div>
         </div>
+ 
+        
       </div>
+    </div>
     );
   }
   // ============= ui fort password ===============
@@ -180,7 +341,7 @@ async function envoyerInformation()
 
             {/* Name */}
             <TextField
-              label="UserName"
+              label="Nom d'utilisateur"
               name="name"
               value={form.name}
               onChange={handleChange}
@@ -225,7 +386,7 @@ async function envoyerInformation()
 
             {/* Username */}
             <TextField
-              label="Nom d'utilisateur"
+              label="UserName"
               name="username"
               value={form.username}
               onChange={handleChange}
@@ -300,7 +461,7 @@ async function envoyerInformation()
               type="submit"
               variant="contained"
               fullWidth
-              onClick={envoyerInformation}
+             
               disabled={loading}
               startIcon={!loading && <HowToRegOutlined />}
               sx={{

@@ -135,8 +135,8 @@ setToken("");
             <Button size="small" className='ml-2 login-class ' sx={token === "" ? {display:"block"}:{display:"none"}}  onClick={handleOpenDialog}> Login</Button>
          <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? {display:"block"}:{display:"none"}}>Register</Button></Link>
             <Stack direction="row" spacing={0.1} sx={token !== "" ?{alignItems:"center" ,flexGrow:1,display:"flex"}:{display:"none"}}>
-      <Avatar alt={userInformation.username != "" ?userInformation.username[0].toUpperCase():"a"} src = {userInformation.profil_image}  />
-      <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{userInformation.username}</Typography>
+      <Avatar alt={userInformation.username != "" ?userInformation.username[0].toUpperCase():"a"} src = {userInformation.profile_image}  />
+      <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{userInformation.username.length > 5 ? userInformation.username.slice(0,5) : userInformation.username }</Typography>
     </Stack>
           <Button size="small" sx={token !== "" ?{ border:"1px solid blue" , paddingLeft:0.3,paddingRight:0.3 , display:"block"} : {display:"none"}} onClick={logout} className='logout' >Logout</Button>
        

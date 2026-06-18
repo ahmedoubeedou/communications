@@ -3,3 +3,21 @@
     outline: none;
     resize: none;
 }
+.border-sty{
+    border-radius: 6px;
+    border :1.6px dashed black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-direction: column;
+
+}
+.icon-clos-photo{
+    /* background-color: blue !important; */
+    width: 99%;
+    text-align: end;
+    /* padding-bottom: 4px; */
+    margin-bottom: 4px;
+    padding-right: 4px;
+}
