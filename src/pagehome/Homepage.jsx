@@ -24,7 +24,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 // ======================== fin Dialog ==================
 //=============== hooks =====================================
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 //=============== hooks =====================================
 //================== piblitique =================================
 import { v4 as uuidv4 } from "uuid";
@@ -34,6 +34,9 @@ import { Typography } from '@mui/material';
 
 
 export default function Homepage({getInformation}){
+  const elment = useRef(null);
+  const [isData , setIsData] = useState(false);
+  const[numberPage , setNumberPage ] = useState(0);
 const [posts , setPost] = useState([]);
 const [openDialog , setopenDialog] = useState(false)
 const [userInformation , setUerInformation] = useState(()=>{
@@ -63,19 +66,26 @@ const [token , setToken] = useState( localStorage.getItem("token") === null ?"" 
     useEffect(()=>{
         try{
            
-  axios.get("https://tarmeezacademy.com/api/v1/posts")
+  axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
          .then((resp)=>{
             // console.log(resp.data.data)
             // uiPost(resp.data.data)
-              setPost( resp.data.data)
+            let posu = [...posts ,...resp.data.data];
+              setPost(posu)
+              if(resp.data.data.length>0)
+              {
+setIsData(true);
+              }
+              
+              console.log("curent page ============"+resp.data.meta.current_page)
+              
          })
-       
         }catch(erorr)
         {
             console.error(erorr)
         }
        
-    } , [])
+    } , [numberPage])
 // ========================= utilisation Useefect pour get Post =======================================
 // ==================== debut logique Dialog ===============
 function handleCloseDialog()
@@ -112,6 +122,7 @@ function LoginCount()
    
     setopenDialog(false)
 }
+
 // ================== fin Login ====================
 // =================== Lougout ========================
 function logout()
@@ -121,6 +132,29 @@ localStorage.removeItem("user");
 setToken("");
 }
 // =================== Lougout ========================
+useEffect(()=>{
+const observer = new IntersectionObserver(
+([entry])=>{
+  if(isData.length >0  && entry.isIntersecting)
+  {
+// console.log(e+"===================="+numberPage);
+setNumberPage((er)=>er+1);
+
+  }
+  
+}
+)
+
+  if(elment.current)
+  {
+    observer.observe(elment.current);
+    // console.log("=== form derinier ==")
+  }
+  // console.log("===================");
+  
+   return () => observer.disconnect();
+},[isData]
+)
     return (
         <>
           <Container maxWidth="sm" >
@@ -136,7 +170,7 @@ setToken("");
          <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? {display:"block"}:{display:"none"}}>Register</Button></Link>
             <Stack direction="row" spacing={0.1} sx={token !== "" ?{alignItems:"center" ,flexGrow:1,display:"flex"}:{display:"none"}}>
       <Avatar alt={userInformation.username != "" ?userInformation.username[0].toUpperCase():"a"} src = {userInformation.profile_image}  />
-      <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{userInformation.username.length > 5 ? userInformation.username.slice(0,5) : userInformation.username }</Typography>
+      <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{userInformation.username.length > 5 ? userInformation.username.slice(0,5) : userInformation.username}</Typography>
     </Stack>
           <Button size="small" sx={token !== "" ?{ border:"1px solid blue" , paddingLeft:0.3,paddingRight:0.3 , display:"block"} : {display:"none"}} onClick={logout} className='logout' >Logout</Button>
        
@@ -146,6 +180,10 @@ setToken("");
           {/* ============================================== fin appBar  ======================================  */}
           {/* ======================== debut posts =============================================*/}
          {post}
+        
+         <div id="test" ref={elment}>
+
+         </div>
          {/* ========================= fin posts =============================================== */}
 
          {/* ========================================== debut Diailog ====================================== */}
