@@ -8,7 +8,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 // ============================================== card  ======================================  
-export default function Cards({profil_image , useNam , coment , srcs ,  created_at , tages})
+export default function Cards({profil_image , body , useNam , coment , srcs ,  created_at , tages})
 {
    let tag = tages.map((el)=>{
     return <button className="m-1 bg-gray-400 text-white rounded-3xl p-1">{el}</button>;
@@ -37,7 +37,7 @@ export default function Cards({profil_image , useNam , coment , srcs ,  created_
         { created_at}
         </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-         rum rerum voluptate officiis magnam, necessitatibus et quos quibusdam error animi commodi placeat fuga maxime dignissimos velit!
+         {body}
         </Typography>
         <p className='w-[90%] h-0.5 bg-gray-600 mt-1 ml-1.5'></p>
       </CardContent>

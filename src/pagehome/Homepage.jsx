@@ -30,15 +30,17 @@ import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from "uuid";
 import axios from 'axios';
 import { Typography } from '@mui/material';
+import { ConstructionOutlined } from '@mui/icons-material';
 //================== piblitique ================================
 
 
 export default function Homepage({getInformation}){
   const elment = useRef(null);
   const [isData , setIsData] = useState(false);
-  const[numberPage , setNumberPage ] = useState(0);
+  const[numberPage , setNumberPage ] = useState(1);
 const [posts , setPost] = useState([]);
 const [openDialog , setopenDialog] = useState(false)
+const [loading , setLoading ] = useState(false);
 const [userInformation , setUerInformation] = useState(()=>{
   try{
     const userinfor = localStorage.getItem("user");
@@ -59,26 +61,34 @@ const [token , setToken] = useState( localStorage.getItem("token") === null ?"" 
 // ========================= ui  get Post =======================================
   let post =  posts.map((el)=>{
     
-       return <Cards key={uuidv4()}  created_at={el. created_at} profil_image={el.author.profile_image} tages={el.tags} useNam={el.author.username} coment={el.comments_count} srcs = {el.image}/>
+       return <Cards key={uuidv4()} body={el.body} created_at={el. created_at} profil_image={el.author.profile_image} tages={el.tags} useNam={el.author.username} coment={el.comments_count} srcs = {el.image}/>
     })
 // ========================= ui  get Post =======================================
 // ========================= utilisation Useefect pour get Post =======================================
+console.log("============= "+numberPage)
     useEffect(()=>{
         try{
-           
+          setLoading(true);
   axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
+
          .then((resp)=>{
             // console.log(resp.data.data)
             // uiPost(resp.data.data)
-            let posu = [...posts ,...resp.data.data];
-              setPost(posu)
+            
+             
               if(resp.data.data.length>0)
               {
+                // let posu = [...posts ,...resp.data.data];
+                 setPost((po)=>[...po,...resp.data.data])
 setIsData(true);
+console.log(resp.data.data)
+              }
+              else{
+                setIsData(false);
               }
               
               console.log("curent page ============"+resp.data.meta.current_page)
-              
+              setLoading(false);
          })
         }catch(erorr)
         {
@@ -135,13 +145,18 @@ setToken("");
 useEffect(()=>{
 const observer = new IntersectionObserver(
 ([entry])=>{
-  if(isData.length >0  && entry.isIntersecting)
+  if(isData && entry.isIntersecting && !loading)
   {
 // console.log(e+"===================="+numberPage);
-setNumberPage((er)=>er+1);
+// let nub = numberPage+1;
+setNumberPage((n)=>n+1);
 
   }
-  
+
+  else{
+    // console.log("lll");
+  }
+
 }
 )
 
@@ -153,7 +168,7 @@ setNumberPage((er)=>er+1);
   // console.log("===================");
   
    return () => observer.disconnect();
-},[isData]
+},[isData , loading ]
 )
     return (
         <>
@@ -181,7 +196,7 @@ setNumberPage((er)=>er+1);
           {/* ======================== debut posts =============================================*/}
          {post}
         
-         <div id="test" ref={elment}>
+         <div id="test" ref={elment} className='h-0.5 w-full bg-red'>
 
          </div>
          {/* ========================= fin posts =============================================== */}
