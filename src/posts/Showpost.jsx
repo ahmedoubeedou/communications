@@ -1,15 +1,22 @@
-import {  Link, useLocation, useParams } from "react-router-dom";
+import {  Link,  useParams } from "react-router-dom";
 import Card from "../pagehome/Cards";
-import { Container } from "@mui/material";
+import { Button, Container } from "@mui/material";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import "./post.css";
 import { useEffect, useState } from "react";
+import Fab from '@mui/material/Fab';
+import EditIcon from '@mui/icons-material/Edit';
+import SendIcon from '@mui/icons-material/Send';
+import TextField from '@mui/material/TextField';
 import axios from "axios";
 export default function Showpost()
 {
     const {idPost} = useParams()
     // creation de boleane si on aller a catche devient false 
     const [idPostNull , setIdPostNull ]= useState(false)
+    const [comentaireAjouter , setComentaireAjouter] = useState(false)
+    const [bodyComantaire , setBodyComantaire ] = useState("");
+    const [ecrireComantaire , setEcrireComantaire] = useState(false);
     const [postInformation , setPostInformation] = useState({comments:[],
 tags:[],author:{
         profile_image:"",
@@ -28,8 +35,28 @@ tags:[],author:{
   setIdPostNull(true)
                   })
               
-            },[])
+            },[comentaireAjouter])
     // ====================== GET posts avec leur donner ===================================
+// ================================ Create comentaire =================================
+async function createComentaire()
+{
+    const token = localStorage.getItem("token")
+    const headr = {
+        "Authorization":`Bearer ${token}`,
+        "Content-Type":"multipart/form-data"
+    }
+   await  axios.post(`https://tarmeezacademy.com/api/v1/posts/${idPost}/comments` , 
+        {
+    "body": bodyComantaire
+}, {headers:headr}
+).catch((error)=>{
+    console.error(error);
+})
+console.log("comment ajouter ")
+setEcrireComantaire(false)
+setComentaireAjouter(true);
+}
+// ================================ Create comentaire =================================
 
    if(idPostNull)
    {
@@ -58,7 +85,26 @@ tags:[],author:{
    {postInformation.author.username} Post
 </h3>
 <Card body={postInformation.body} created_at={postInformation.created_at} profil_image={postInformation.author.profile_image} tages={postInformation.tags} useNam={postInformation.author.username} coment={postInformation.comments_count} srcs = {postInformation.image} comments={postInformation.comments} />
+ {/* ==============  */}
+<div className={`w-full  justify-around items-center m-2 ${ecrireComantaire ? "hidden":"flex"}`}>
+<p className="text-base font-medium text-gray-600 flex items-center gap-2 hover:text-blue-500 transition-colors duration-300 cursor-pointer">
+  
+  Ajouter un commentaire
+</p>
+ <Fab color="secondary" aria-label="edit" onClick={()=>{setEcrireComantaire(true)}} >
+        <EditIcon  />
+      </Fab>
+    </div>  
+     {/* ==============  */}
+    {/* ==============  */}
+    <div className={`w-full  justify-around items-center mt-4 ${ecrireComantaire ? "flex":"hidden"}`}>
+        <TextField id="outlined-basic" label="VoterComment" variant="outlined" value={bodyComantaire} onChange={(event)=>{setBodyComantaire(event.target.value)}}/>
+         <Button variant="contained" endIcon={<SendIcon />} onClick={createComentaire}>
+  Envoyer
+</Button>
 
+    </div>
+       {/* ==============  */}
 </div>
 <Link to="/">
 <div className="link-home-page">
