@@ -7,14 +7,22 @@ import Typography from '@mui/material/Typography';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
+import { v4 as uuidv4 } from "uuid";
+// import { Typography } from '@mui/material';
 // ============================================== card  ======================================  
-export default function Cards({profil_image , body , useNam , coment , srcs ,  created_at , tages})
+export default function Cards({profil_image , body , useNam , coment , srcs ,  created_at , tages , comments=[]})
 {
    let tag = tages.map((el)=>{
     return <button className="m-1 bg-gray-400 text-white rounded-3xl p-1">{el}</button>;
    })
-  
-
+   
+    // ==================== comments ui ===============================
+    let uiComments = comments.map((elment)=>{
+        return  <Stack key={uuidv4()} direction="row" spacing={7} sx={{alignItems:"center" ,flexGrow:1,display:"flex" , margin:"10px"}}>
+      <Avatar alt={elment.author.username != "" ?elment.author.username[0].toUpperCase():"a"} src = {elment.author.profile_image}  /> <br/>
+      <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{elment.body}</Typography>
+    </Stack>
+    })
     return(
         <>
         {/* ============================================== card  ======================================  */}
@@ -45,7 +53,7 @@ export default function Cards({profil_image , body , useNam , coment , srcs ,  c
         <BorderColorIcon aria-label="add to favorites" /> ({coment}) comment
             {tag}
       </CardActions>
-     
+       {uiComments}
     </Card>
           {/* ============================================== card  ======================================  */}
 

@@ -1,6 +1,7 @@
 // ===================== import page ===============================
 import Homepage from "./pagehome/Homepage";
 import CreatePost from "./posts/CreatePost";
+import Showpost from "./posts/Showpost";
 // ===================== import page ===============================
 //================ user Information ====================================
 import { information } from "./context/Userinformation";
@@ -22,9 +23,11 @@ function App() {
   return (
     <>
     <Routes>
-      <Route path="/" element={ <information.Provider value={token}><Homepage getInformation={getInformation}/></information.Provider>} />
+      <Route path="/" element={<information.Provider value={token}><Homepage getInformation={getInformation}/></information.Provider>} />
       <Route path="/register" element={<RegisterPage/>} />
       <Route path="/createpost" element={<CreatePost/>}/>
+      <Route path="/Showpost/:idPost" element={<Showpost/>} />
+      
       <Route path="*" element={<NotFound/>}/>
       </Routes>
    </>

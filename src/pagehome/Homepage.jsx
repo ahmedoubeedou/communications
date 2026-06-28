@@ -30,7 +30,7 @@ import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from "uuid";
 import axios from 'axios';
 import { Typography } from '@mui/material';
-import { ConstructionOutlined } from '@mui/icons-material';
+// import { ConstructionOutlined } from '@mui/icons-material';
 //================== piblitique ================================
 
 
@@ -40,7 +40,7 @@ export default function Homepage({getInformation}){
   const[numberPage , setNumberPage ] = useState(1);
 const [posts , setPost] = useState([]);
 const [openDialog , setopenDialog] = useState(false)
-const [loading , setLoading ] = useState(false);
+const [loading , setLoading ] = useState(true);
 const [userInformation , setUerInformation] = useState(()=>{
   try{
     const userinfor = localStorage.getItem("user");
@@ -60,20 +60,18 @@ const [token , setToken] = useState( localStorage.getItem("token") === null ?"" 
 // ==================== Fin getTokenLocalStorage ================================
 // ========================= ui  get Post =======================================
   let post =  posts.map((el)=>{
-    
-       return <Cards key={uuidv4()} body={el.body} created_at={el. created_at} profil_image={el.author.profile_image} tages={el.tags} useNam={el.author.username} coment={el.comments_count} srcs = {el.image}/>
+        let urlShowPost = `/Showpost/${el.id}`
+       return <Link key={uuidv4()} to = {urlShowPost} > <Cards  body={el.body} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} useNam={el.author.username} coment={el.comments_count} srcs = {el.image}/> </Link>
     })
 // ========================= ui  get Post =======================================
 // ========================= utilisation Useefect pour get Post =======================================
-console.log("============= "+numberPage)
+  
     useEffect(()=>{
         try{
           setLoading(true);
   axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
-
          .then((resp)=>{
-            // console.log(resp.data.data)
-            // uiPost(resp.data.data)
+          
             
              
               if(resp.data.data.length>0)
@@ -81,13 +79,10 @@ console.log("============= "+numberPage)
                 // let posu = [...posts ,...resp.data.data];
                  setPost((po)=>[...po,...resp.data.data])
 setIsData(true);
-console.log(resp.data.data)
               }
               else{
                 setIsData(false);
               }
-              
-              console.log("curent page ============"+resp.data.meta.current_page)
               setLoading(false);
          })
         }catch(erorr)

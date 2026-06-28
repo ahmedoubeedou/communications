@@ -8,3 +8,10 @@
     color:white !important;
     /* font-weight: 800 !important; */
 }
+.link-home-page{
+    text-align: center;
+    color:black;
+    text-decoration: underline;
+    display: flex;
+    align-items: center;
+}

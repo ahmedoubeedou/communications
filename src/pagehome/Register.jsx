@@ -9,12 +9,10 @@ import MarkEmailUnreadIcon from '@mui/icons-material/MarkEmailUnread';
 import Container from '@mui/material/Container';
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import LoginIcon from '@mui/icons-material/Login';
-// import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import Alert from '@mui/material/Alert';
-// import Input from '@mui/material/Input';
 import { Link } from "react-router-dom";
 import axios from "axios";
 function getStrength(pwd) {
@@ -44,13 +42,10 @@ const FIELD_SX = {
   "& .MuiFormHelperText-root": { fontSize: "12px", ml: "2px" },
   "& .MuiInputAdornment-root svg": { fontSize: "19px", color: "#475569" },
 };
-
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", username: "", password: "" });
   const [errors, setErrors] = useState({});
-//   pour le password devient visible n;est pas fait jusque maintent
   const [showPwd, setShowPwd] = useState(false);
-//   pour le password devient visible n;est pas fait jusque maintent
  const[fortpas , setFortpass] = useState(getStrength(form.password))
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
