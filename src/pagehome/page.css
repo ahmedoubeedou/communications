@@ -1,0 +1,10 @@
+.edit-mon-post{
+    background-color: rgb(49, 49, 196);
+    width:40px;
+    height: 40px;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

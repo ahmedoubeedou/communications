@@ -1,9 +1,9 @@
-import {  Link,  useParams } from "react-router-dom";
+import {  Link,  useParams , useLocation} from "react-router-dom";
 import Card from "../pagehome/Cards";
 import { Button, Container } from "@mui/material";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import "./post.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState  } from "react";
 import Fab from '@mui/material/Fab';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
@@ -12,7 +12,8 @@ import axios from "axios";
 export default function Showpost()
 {
     const {idPost} = useParams()
-    // creation de boleane si on aller a catche devient false 
+    // const ShowPost = useLocation();
+    // console.log(ShowPost.state)
     const [idPostNull , setIdPostNull ]= useState(false)
     const [comentaireAjouter , setComentaireAjouter] = useState(false)
     const [bodyComantaire , setBodyComantaire ] = useState("");
@@ -27,7 +28,6 @@ tags:[],author:{
                 
                     axios.get(`https://tarmeezacademy.com/api/v1/posts/${idPost}`)
                   .then((res)=>{
-
  setPostInformation(res.data.data)
  
                   }).catch((error)=>{      

@@ -34,182 +34,168 @@ import { Typography } from '@mui/material';
 //================== piblitique ================================
 
 
-export default function Homepage({getInformation}){
+export default function Homepage({ getInformation }) {
   const elment = useRef(null);
-  const [isData , setIsData] = useState(false);
-  const[numberPage , setNumberPage ] = useState(1);
-const [posts , setPost] = useState([]);
-const [openDialog , setopenDialog] = useState(false)
-const [loading , setLoading ] = useState(true);
-const [userInformation , setUerInformation] = useState(()=>{
-  try{
-    const userinfor = localStorage.getItem("user");
-    return userinfor ? JSON.parse(userinfor):{username:"",profile_image:""};
-  }catch(er)
-  {
-        console.error(er)
-    return {username:"",profile_image:""};
-  }
-})
-const [informationLogin , setInformationLogin] = useState({
-    use:"test4316",
-    pasw : "token43"
-})
-const [token , setToken] = useState( localStorage.getItem("token") === null ?"" : localStorage.getItem("token") )
-// ==================== Debut getTokenLocalStorage ================================
-// ==================== Fin getTokenLocalStorage ================================
-// ========================= ui  get Post =======================================
-  let post =  posts.map((el)=>{
-        let urlShowPost = `/Showpost/${el.id}`
-       return <Link key={uuidv4()} to = {urlShowPost} > <Cards  body={el.body} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} useNam={el.author.username} coment={el.comments_count} srcs = {el.image}/> </Link>
-    })
-// ========================= ui  get Post =======================================
-// ========================= utilisation Useefect pour get Post =======================================
-  
-    useEffect(()=>{
-        try{
-          setLoading(true);
-  axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
-         .then((resp)=>{
-          
-            
-             
-              if(resp.data.data.length>0)
-              {
-                // let posu = [...posts ,...resp.data.data];
-                 setPost((po)=>[...po,...resp.data.data])
-setIsData(true);
-              }
-              else{
-                setIsData(false);
-              }
-              setLoading(false);
-         })
-        }catch(erorr)
-        {
-            console.error(erorr)
-        }
-       
-    } , [numberPage])
-// ========================= utilisation Useefect pour get Post =======================================
-// ==================== debut logique Dialog ===============
-function handleCloseDialog()
-{
-    setopenDialog(false)
-}
-function handleOpenDialog(){
- setopenDialog(true);
-}
-// ==================== fin logique Dialog ===============
-// ================== debut Login ====================
-function LoginCount()
-{
-    // console.log(informationLogin.use , informationLogin.pasw);
-    try{
-    axios.post("https://tarmeezacademy.com/api/v1/login",
-{
-     "username" : informationLogin.use,
-    "password" : informationLogin.pasw
-}).then((response)=>{
-    // console.log(response)
-    localStorage.setItem("token" , response.data.token)
-    localStorage.setItem("user" , JSON.stringify( response.data.user))
-    setToken(response.data.token)
-     getInformation(response.data.token);
-    setUerInformation(response.data.user);
-    // console.log(response.data)
-     setInformationLogin({   use:"", pasw : ""})
-})
-    }catch(erore)
-    {
-        console.error(erore)
+  const [isData, setIsData] = useState(false);
+  const [numberPage, setNumberPage] = useState(1);
+  const [posts, setPost] = useState([]);
+  const [openDialog, setopenDialog] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [userInformation, setUerInformation] = useState(() => {
+    try {
+      const userinfor = localStorage.getItem("user");
+      return userinfor ? JSON.parse(userinfor) : { username: "", profile_image: "" };
+    } catch (er) {
+      console.error(er)
+      return { username: "", profile_image: "" };
     }
-   
+  })
+  const [informationLogin, setInformationLogin] = useState({
+    use: "test4316",
+    pasw: "token43"
+  })
+  // ==================== Debut getTokenLocalStorage ================================
+  const [token, setToken] = useState(localStorage.getItem("token") === null ? "" : localStorage.getItem("token"))
+  // ==================== Fin getTokenLocalStorage ================================
+
+  // ========================= utilisation Useefect pour get Post =======================================
+
+  useEffect(() => {
+    setLoading(true);
+    try {
+      axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
+        .then((resp) => {
+          if (resp.data.data.length > 0) {
+            // let posu = [...posts ,...resp.data.data];
+            setPost((po) => [...po, ...resp.data.data])
+            setIsData(true);
+          }
+          else {
+            setIsData(false);
+          }
+          setLoading(false);
+        })
+    } catch (erorr) {
+      console.error(erorr)
+    }
+
+  }, [numberPage])
+  // ========================= utilisation Useefect pour get Post =======================================
+  // ==================== debut logique Dialog ===============
+  function handleCloseDialog() {
     setopenDialog(false)
-}
-
-// ================== fin Login ====================
-// =================== Lougout ========================
-function logout()
-{
-localStorage.removeItem("token");
-localStorage.removeItem("user");
-setToken("");
-}
-// =================== Lougout ========================
-useEffect(()=>{
-const observer = new IntersectionObserver(
-([entry])=>{
-  if(isData && entry.isIntersecting && !loading)
-  {
-// console.log(e+"===================="+numberPage);
-// let nub = numberPage+1;
-setNumberPage((n)=>n+1);
-
+  }
+  function handleOpenDialog() {
+    setopenDialog(true);
+  }
+  // ==================== fin logique Dialog ===============
+  // ================== debut Login ====================
+  function LoginCount() {
+    // console.log(informationLogin.use , informationLogin.pasw);
+    try {
+      axios.post("https://tarmeezacademy.com/api/v1/login",
+        {
+          "username": informationLogin.use,
+          "password": informationLogin.pasw
+        }).then((response) => {
+          // console.log(response)
+          localStorage.setItem("token", response.data.token)
+          localStorage.setItem("user", JSON.stringify(response.data.user))
+          setToken(response.data.token)
+          getInformation(response.data.token);
+          setUerInformation(response.data.user);
+          // console.log(response.data)
+          setInformationLogin({ use: "", pasw: "" })
+        })
+    } catch (erore) {
+      console.error(erore)
+    }
+    setopenDialog(false)
   }
 
-  else{
-    // console.log("lll");
+  // ================== fin Login ====================
+  // =================== Lougout ========================
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setToken("");
   }
+  // =================== Lougout ========================
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (isData && entry.isIntersecting && !loading) {
+          setNumberPage((n) => n + 1);
+        }
 
-}
-)
+        else {
+          // console.log("lll");
+        }
 
-  if(elment.current)
-  {
-    observer.observe(elment.current);
-    // console.log("=== form derinier ==")
-  }
-  // console.log("===================");
-  
-   return () => observer.disconnect();
-},[isData , loading ]
-)
-    return (
-        <>
-          <Container maxWidth="sm" >
-              {/* ============================================== debut appBar  ======================================  */}
-                 <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{borderRadius:2 , backgroundColor:"#e0e0e0"  ,marginTop:1}}>
-        <Toolbar sx={{color:'black' , gap:1 , cursor:"pointer"}}>
-        <h5 className='grow sm:text-3xl ' >Baba</h5>
-        <p  className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Home</p>
-        <p  className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Profile</p>
-          {/* <Button variant="contained"  size="small"  color="success">Login</Button> */}
-            <Button size="small" className='ml-2 login-class ' sx={token === "" ? {display:"block"}:{display:"none"}}  onClick={handleOpenDialog}> Login</Button>
-         <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? {display:"block"}:{display:"none"}}>Register</Button></Link>
-            <Stack direction="row" spacing={0.1} sx={token !== "" ?{alignItems:"center" ,flexGrow:1,display:"flex"}:{display:"none"}}>
-      <Avatar alt={userInformation.username != "" ?userInformation.username[0].toUpperCase():"a"} src = {userInformation.profile_image}  />
-      <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{userInformation.username.length > 5 ? userInformation.username.slice(0,5) : userInformation.username}</Typography>
-    </Stack>
-          <Button size="small" sx={token !== "" ?{ border:"1px solid blue" , paddingLeft:0.3,paddingRight:0.3 , display:"block"} : {display:"none"}} onClick={logout} className='logout' >Logout</Button>
-       
-        </Toolbar>
-      </AppBar>
-    </Box>
-          {/* ============================================== fin appBar  ======================================  */}
-          {/* ======================== debut posts =============================================*/}
-         {post}
-        
-         <div id="test" ref={elment} className='h-0.5 w-full bg-red'>
+      }
+    )
+    if (elment.current) {
+      observer.observe(elment.current);
+      // console.log("=== form derinier ==")
+    }
+    // console.log("===================");
 
-         </div>
-         {/* ========================= fin posts =============================================== */}
+    return () => observer.disconnect();
+  }, [isData, loading]
+  )
 
-         {/* ========================================== debut Diailog ====================================== */}
-           <Dialog open={openDialog} onClose={handleCloseDialog} disableRestoreFocus>
-        <DialogTitle className='text-center' >Login</DialogTitle>
-        <DialogContent>
-         
+  // ========================= ui  get Post =======================================
+  let post = posts.map((el) => {
+    let urlShowPost = `/Showpost/${el.id}`
+    return <Link key={uuidv4()} to={urlShowPost} > <Cards body={el.body} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={el.image} /> </Link>
+  })
+  // je essaie de faire une page unique pour update post et showPost  state={"showPost"}
+  // ========================= ui  get Post =======================================
+  return (
+    <>
+      <Container maxWidth="sm" >
+        {/* ============================================== debut appBar  ======================================  */}
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar position="static" sx={{ borderRadius: 2, backgroundColor: "#e0e0e0", marginTop: 1 }}>
+            <Toolbar sx={{ color: 'black', gap: 1, cursor: "pointer" }}>
+              <h5 className='grow sm:text-3xl ' >Baba</h5>
+              <p className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Home</p>
+              <p className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Profile</p>
+              {/* <Button variant="contained"  size="small"  color="success">Login</Button> */}
+              <Button size="small" className='ml-2 login-class ' sx={token === "" ? { display: "block" } : { display: "none" }} onClick={handleOpenDialog}> Login</Button>
+              <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? { display: "block" } : { display: "none" }}>Register</Button></Link>
+              <Stack direction="row" spacing={0.1} sx={token !== "" ? { alignItems: "center", flexGrow: 1, display: "flex" } : { display: "none" }}>
+                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"} src={userInformation.profile_image} />
+                <Typography variant='subtitle1' sx={{ fontSize: "16px" }}>{userInformation.username.length > 5 ? userInformation.username.slice(0, 5) : userInformation.username}</Typography>
+              </Stack>
+              <Button size="small" sx={token !== "" ? { border: "1px solid blue", paddingLeft: 0.3, paddingRight: 0.3, display: "block" } : { display: "none" }} onClick={logout} className='logout' >Logout</Button>
+
+            </Toolbar>
+          </AppBar>
+        </Box>
+        {/* ============================================== fin appBar  ======================================  */}
+        {/* ======================== debut posts =============================================*/}
+        {post}
+
+        <div id="test" ref={elment} className='h-0.5 w-full bg-red'>
+
+        </div>
+        {/* ========================= fin posts =============================================== */}
+
+        {/* ========================================== debut Diailog ====================================== */}
+        <Dialog open={openDialog} onClose={handleCloseDialog} disableRestoreFocus>
+          <DialogTitle className='text-center' >Login</DialogTitle>
+          <DialogContent>
+
             <TextField
               autoFocus
               required
               margin="dense"
-              sx = {{
-      // On cible la classe spécifique de l'étoile générée par MUI
-      '& .MuiFormLabel-asterisk': {
-        display: 'none',
-      },
+              sx={{
+                // On cible la classe spécifique de l'étoile générée par MUI
+                '& .MuiFormLabel-asterisk': {
+                  display: 'none',
+                },
               }}
               id="name"
               name="text"
@@ -218,7 +204,7 @@ setNumberPage((n)=>n+1);
               fullWidth
               variant="standard"
               value={informationLogin.use}
-              onChange={(e)=>{setInformationLogin({...informationLogin , use:e.target.value})}}
+              onChange={(e) => { setInformationLogin({ ...informationLogin, use: e.target.value }) }}
             />
 
             <TextField
@@ -228,30 +214,30 @@ setNumberPage((n)=>n+1);
               id="name"
               name="email"
               label="Password"
-              sx={{"& .MuiFormLabel-asterisk":{display:"none"}}}
+              sx={{ "& .MuiFormLabel-asterisk": { display: "none" } }}
               type="password"
               fullWidth
               variant="standard"
-               value={informationLogin.pasw}
-              onChange={(e)=>{setInformationLogin({...informationLogin , pasw:e.target.value})}}
+              value={informationLogin.pasw}
+              onChange={(e) => { setInformationLogin({ ...informationLogin, pasw: e.target.value }) }}
             />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={LoginCount}>
-            Login
-          </Button>
-        </DialogActions>
-      </Dialog>
-               {/* ========================================== fin Diailog ====================================== */}
-               {/* ========================================== debut Add post ==================================== */}
-               <Link to="/createpost">
-                <div className={`w-12 items-center justify-center h-12 rounded-full bg-blue-700 cursor-pointer fixed bottom-0  right-0  mb-2 mr-1 sm:mb-4 sm:mr-4  hover:bg-blue-600 hover:text-amber-50 text-white transition ${token?"flex":"hidden"}`}>
-                 <AddIcon sx={{color:"while" , fontSize:"38px"}} />
-                </div>
-                </Link>
-                {/* ========================================== fin Add post ==================================== */}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={LoginCount}>
+              Login
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* ========================================== fin Diailog ====================================== */}
+        {/* ========================================== debut Add post ==================================== */}
+        <Link to="/createpost">
+          <div className={`w-12 items-center justify-center h-12 rounded-full bg-blue-700 cursor-pointer fixed bottom-0  right-0  mb-2 mr-1 sm:mb-4 sm:mr-4  hover:bg-blue-600 hover:text-amber-50 text-white transition ${token ? "flex" : "hidden"}`}>
+            <AddIcon sx={{ color: "while", fontSize: "38px" }} />
+          </div>
+        </Link>
+        {/* ========================================== fin Add post ==================================== */}
       </Container>
-        </>
-    )
+    </>
+  )
 }

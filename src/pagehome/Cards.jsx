@@ -8,14 +8,16 @@ import BorderColorIcon from '@mui/icons-material/BorderColor';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { v4 as uuidv4 } from "uuid";
+import CreateIcon from '@mui/icons-material/Create';
+import "./page.css";
 // import { Typography } from '@mui/material';
 // ============================================== card  ======================================  
-export default function Cards({profil_image , body , useNam , coment , srcs ,  created_at , tages , comments=[]})
+export default function Cards({profil_image , body , useNam , coment , srcs ,  created_at , tages , comments=[],isUser})
 {
    let tag = tages.map((el)=>{
     return <button className="m-1 bg-gray-400 text-white rounded-3xl p-1">{el}</button>;
    })
-   
+   console.log(isUser)
     // ==================== comments ui ===============================
     let uiComments = comments.map((elment)=>{
         return  <Stack key={uuidv4()} direction="row" spacing={7} sx={{alignItems:"center" ,flexGrow:1,display:"flex" , margin:"10px"}}>
@@ -49,9 +51,14 @@ export default function Cards({profil_image , body , useNam , coment , srcs ,  c
         </Typography>
         <p className='w-[90%] h-0.5 bg-gray-600 mt-1 ml-1.5'></p>
       </CardContent>
-      <CardActions disableSpacing>
-        <BorderColorIcon aria-label="add to favorites" /> ({coment}) comment
-            {tag}
+      <CardActions disableSpacing sx={{display:"flex" , justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+           <BorderColorIcon aria-label="add to favorites" /> ({coment}) comment
+            {tag} 
+        </div>
+       <div className={`${isUser ? "edit-mon-post":"hidden"}`}>     
+       <CreateIcon sx={{color:"white" , fontSize:"30px"}}/>
+       </div>
       </CardActions>
        {uiComments}
     </Card>
