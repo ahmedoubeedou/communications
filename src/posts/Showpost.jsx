@@ -12,8 +12,8 @@ import axios from "axios";
 export default function Showpost()
 {
     const {idPost} = useParams()
-    // const ShowPost = useLocation();
-    // console.log(ShowPost.state)
+    const informationPost  = useLocation();
+    const ShowOrUpdate = informationPost.state;
     const [idPostNull , setIdPostNull ]= useState(false)
     const [comentaireAjouter , setComentaireAjouter] = useState(false)
     const [bodyComantaire , setBodyComantaire ] = useState("");
@@ -31,7 +31,7 @@ tags:[],author:{
  setPostInformation(res.data.data)
  
                   }).catch((error)=>{      
-  console.error(error);
+  console.error("=== zE"+error);
   setIdPostNull(true)
                   })
               
@@ -43,7 +43,7 @@ async function createComentaire()
     const token = localStorage.getItem("token")
     const headr = {
         "Authorization":`Bearer ${token}`,
-        "Content-Type":"multipart/form-data"
+      
     }
    await  axios.post(`https://tarmeezacademy.com/api/v1/posts/${idPost}/comments` , 
         {
@@ -52,12 +52,28 @@ async function createComentaire()
 ).catch((error)=>{
     console.error(error);
 })
-console.log("comment ajouter ")
+
 setEcrireComantaire(false)
 setComentaireAjouter(true);
 }
 // ================================ Create comentaire =================================
-
+// ================= update Post ==========================================
+async function updatePost(){
+    const token = localStorage.getItem("token")
+    const headr = {
+        "Authorization":`Bearer ${token}`  , 
+    }
+   await  axios.put(`https://tarmeezacademy.com/api/v1/posts/${idPost}` , 
+        {
+    "body": bodyComantaire
+}, {headers:headr}
+).catch((error)=>{
+    console.error(error);
+})
+setEcrireComantaire(false)
+setComentaireAjouter(true);
+}
+// ================= update Post ==========================================
    if(idPostNull)
    {
     return (
@@ -82,14 +98,14 @@ setComentaireAjouter(true);
     <>
  <Container maxWidth="sm" sx={{ height:"100vh", gap:"6px" ,display:"flex",flexDirection:"column", alignItems:"center" , justifyContent:"space-around"}}>
     <div><h3 className="text-2xl font-bold text-gray-800 tracking-wide text-center mb-7 w-full border-b-2 border-blue-500 pb-2 inline-block hover:text-blue-500 transition-colors duration-300 cursor-default">
-   {postInformation.author.username} Post
+   {postInformation.author.username} Post {ShowOrUpdate==="showpost"? "View":"Modifier"}
 </h3>
 <Card body={postInformation.body} created_at={postInformation.created_at} profil_image={postInformation.author.profile_image} tages={postInformation.tags} useNam={postInformation.author.username} coment={postInformation.comments_count} srcs = {postInformation.image} comments={postInformation.comments} />
  {/* ==============  */}
 <div className={`w-full  justify-around items-center m-2 ${ecrireComantaire ? "hidden":"flex"}`}>
 <p className="text-base font-medium text-gray-600 flex items-center gap-2 hover:text-blue-500 transition-colors duration-300 cursor-pointer">
+{ShowOrUpdate==="showpost"? "Ajouter un commentaire":"Modifier le body du post"}
   
-  Ajouter un commentaire
 </p>
  <Fab color="secondary" aria-label="edit" onClick={()=>{setEcrireComantaire(true)}} >
         <EditIcon  />
@@ -98,8 +114,8 @@ setComentaireAjouter(true);
      {/* ==============  */}
     {/* ==============  */}
     <div className={`w-full  justify-around items-center mt-4 ${ecrireComantaire ? "flex":"hidden"}`}>
-        <TextField id="outlined-basic" label="VoterComment" variant="outlined" value={bodyComantaire} onChange={(event)=>{setBodyComantaire(event.target.value)}}/>
-         <Button variant="contained" endIcon={<SendIcon />} onClick={createComentaire}>
+        <TextField id="outlined-basic" label={ShowOrUpdate==="showpost"? "Ajouter un commentaire":"Modifier le body du post"} variant="outlined" value={bodyComantaire} onChange={(event)=>{setBodyComantaire(event.target.value)}}/>
+         <Button variant="contained" endIcon={<SendIcon />} onClick={ShowOrUpdate==="showpost" ? createComentaire : updatePost}>
   Envoyer
 </Button>
 

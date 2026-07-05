@@ -8,9 +8,10 @@ import { information } from "./context/Userinformation";
 import { useState } from "react";
 //================ user Information ====================================
 // ===================== Pibliotique ===================
-import { Route , Routes } from "react-router-dom";
+import { Route , Routes  } from "react-router-dom";
 import NotFound from "./pagehome/NotFond";
 import RegisterPage from "./pagehome/Register";
+import Profiel from "./pagehome/Profiel";
 // ===================== Pibliotique ===================
 function App() {
   const [token , setToken ] = useState("")
@@ -27,11 +28,11 @@ function App() {
       <Route path="/register" element={<RegisterPage/>} />
       <Route path="/createpost" element={<CreatePost/>}/>
       <Route path="/Showpost/:idPost" element={<Showpost/>} />
-      
+      <Route path="/profile/:idUser" element={<Profiel/>} />
       <Route path="*" element={<NotFound/>}/>
       </Routes>
+     
    </>
   )
 }
-
 export default App

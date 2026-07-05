@@ -7,6 +7,12 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Cards from './Cards';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 // ============================================== appBar  ====================================== 
 // ================= photo utilisateur =========================
 
@@ -18,9 +24,6 @@ import AddIcon from '@mui/icons-material/Add';
 // ============================ button add Post===========================
 // =========================== dialog =========================
 import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 // ======================== fin Dialog ==================
 //=============== hooks =====================================
@@ -30,6 +33,7 @@ import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from "uuid";
 import axios from 'axios';
 import { Typography } from '@mui/material';
+import { Token } from '@mui/icons-material';
 // import { ConstructionOutlined } from '@mui/icons-material';
 //================== piblitique ================================
 
@@ -41,6 +45,10 @@ export default function Homepage({ getInformation }) {
   const [posts, setPost] = useState([]);
   const [openDialog, setopenDialog] = useState(false)
   const [loading, setLoading] = useState(true);
+  const [status , setStatus] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openDialogSuprimer, setOpenDialogSuprimer] = useState(false);
+  const [idPost, setIdPost] = useState(null);
   const [userInformation, setUerInformation] = useState(() => {
     try {
       const userinfor = localStorage.getItem("user");
@@ -50,6 +58,7 @@ export default function Homepage({ getInformation }) {
       return { username: "", profile_image: "" };
     }
   })
+   const profielLink = `/profile/`+userInformation.id;
   const [informationLogin, setInformationLogin] = useState({
     use: "test4316",
     pasw: "token43"
@@ -57,16 +66,27 @@ export default function Homepage({ getInformation }) {
   // ==================== Debut getTokenLocalStorage ================================
   const [token, setToken] = useState(localStorage.getItem("token") === null ? "" : localStorage.getItem("token"))
   // ==================== Fin getTokenLocalStorage ================================
-
+// ====================== close snackbar ==========================
+function handleClose(){
+    setOpenSnackbar(false);
+  }
+  // ====================== close snackbar ==========================
+  // ====================== close dialog ==========================
+    function handleCloseDialog() {
+    setOpenDialog(false);
+  }
+// ====================== close dialog ==========================
   // ========================= utilisation Useefect pour get Post =======================================
 
   useEffect(() => {
+    let isActive = true; 
     setLoading(true);
     try {
       axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
         .then((resp) => {
+          if (!isActive) return;
           if (resp.data.data.length > 0) {
-            // let posu = [...posts ,...resp.data.data];
+            
             setPost((po) => [...po, ...resp.data.data])
             setIsData(true);
           }
@@ -78,7 +98,9 @@ export default function Homepage({ getInformation }) {
     } catch (erorr) {
       console.error(erorr)
     }
-
+ return () => {
+    isActive = false;
+  };
   }, [numberPage])
   // ========================= utilisation Useefect pour get Post =======================================
   // ==================== debut logique Dialog ===============
@@ -86,8 +108,10 @@ export default function Homepage({ getInformation }) {
     setopenDialog(false)
   }
   function handleOpenDialog() {
+    
     setopenDialog(true);
   }
+
   // ==================== fin logique Dialog ===============
   // ================== debut Login ====================
   function LoginCount() {
@@ -121,6 +145,41 @@ export default function Homepage({ getInformation }) {
     setToken("");
   }
   // =================== Lougout ========================
+  // =============== logique pour suprimer post =========================
+  // ================= delate ===========================
+   function delatePost()
+  {
+    axios.delete(`https://tarmeezacademy.com/api/v1/posts/${idPost}` , {
+      headers: {
+        "Authorization": `Bearer ${token}`  
+  } }).then((res)=>{
+    let postFilter = posts.filter((el)=>el.id !== idPost)
+    setPost(postFilter);
+    setStatus(true);
+    setOpenSnackbar(true);
+    }).catch((error)=>{
+      console.error(error);
+      setStatus(false);
+      setOpenSnackbar(true);
+    })
+  }
+  // ================= delate ===========================
+  function handleCloseSuprimer()
+  {
+    setOpenDialogSuprimer(false);
+  }
+  function handleOpenSuprimer(idPost)
+  {
+ setIdPost(idPost);
+    setOpenDialogSuprimer(true);
+  }
+  function handleConfirmSuprimer()
+  {
+    delatePost();
+    setOpenDialogSuprimer(false);
+  }
+  // ============== logique pour suprimer post =========================
+  
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -139,15 +198,12 @@ export default function Homepage({ getInformation }) {
       // console.log("=== form derinier ==")
     }
     // console.log("===================");
-
     return () => observer.disconnect();
-  }, [isData, loading]
-  )
-
-  // ========================= ui  get Post =======================================
+}, [isData, loading])
+  // ========================= ui  get Post  =======================================
   let post = posts.map((el) => {
-    let urlShowPost = `/Showpost/${el.id}`
-    return <Link key={uuidv4()} to={urlShowPost} > <Cards body={el.body} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={el.image} /> </Link>
+    
+    return  <Cards key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={el.image} delatePost={handleOpenSuprimer} />
   })
   // je essaie de faire une page unique pour update post et showPost  state={"showPost"}
   // ========================= ui  get Post =======================================
@@ -160,7 +216,7 @@ export default function Homepage({ getInformation }) {
             <Toolbar sx={{ color: 'black', gap: 1, cursor: "pointer" }}>
               <h5 className='grow sm:text-3xl ' >Baba</h5>
               <p className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Home</p>
-              <p className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Profile</p>
+             <Link to={profielLink}> <p className='grow sm:text-2xl hover:underline hover:text-[#123] transition'>Profile</p></Link>
               {/* <Button variant="contained"  size="small"  color="success">Login</Button> */}
               <Button size="small" className='ml-2 login-class ' sx={token === "" ? { display: "block" } : { display: "none" }} onClick={handleOpenDialog}> Login</Button>
               <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? { display: "block" } : { display: "none" }}>Register</Button></Link>
@@ -236,7 +292,36 @@ export default function Homepage({ getInformation }) {
             <AddIcon sx={{ color: "while", fontSize: "38px" }} />
           </div>
         </Link>
-        {/* ========================================== fin Add post ==================================== */}
+
+      {/* ========================================== fin Add post ==================================== */}
+      <Snackbar
+              open={openSnackbar}
+              autoHideDuration={2000}
+              onClose={handleClose}
+            >
+             {  status ?  <Alert severity="success">Post supprimé avec succès</Alert> : <Alert severity="error">Erreur lors de la suppression du post</Alert>}
+              </Snackbar>
+                {/* //  ========================= Dialog ======================================= */}
+     <Dialog
+        open={openDialogSuprimer}
+        onClose={handleCloseSuprimer}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        role="alertdialog"
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            si tu supprime ce post il sera supprimé définitivement et tu ne pourra pas le récuperer
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSuprimer}>
+            Annuler
+          </Button>
+          <Button onClick={handleConfirmSuprimer} sx={{color:"red"}}>Suprimer</Button>
+        </DialogActions>
+      </Dialog>
+    {/* // ======================== Dialog =======================================  */}
       </Container>
     </>
   )

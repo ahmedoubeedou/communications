@@ -8,3 +8,38 @@
     justify-content: center;
     align-items: center;
 }
+.image-profile{
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+
+}
+.link-home-page-profiel{
+    color:white;
+    margin:10px 1px;
+}
+.delete-my-post{
+background-color:red;
+    width:40px;
+    height: 40px;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.snackbar-success{
+    color: green !important;
+    background-color:white !important;
+     padding: 10px;
+    
+    border-radius: 5px;
+}
+.snackbar-error{
+    color: red !important;
+    background-color: white !important;
+    padding: 10px;
+  
+    border-radius: 5px;
+}
