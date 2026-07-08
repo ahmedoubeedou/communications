@@ -69,7 +69,7 @@ export default function Profiel()
      useEffect(()=>{
           axios.get(`https://tarmeezacademy.com/api/v1/users/${idUser}`)
             .then((res)=>{
-                setIdUserNull(false)   
+                
                 setUserInformation(res.data.data)
                 getUserPosts();
             }).catch((error)=>{
@@ -80,7 +80,7 @@ export default function Profiel()
     let userPost = userPosts.map((el)=>{
            return  <Card  key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={el.image} delatePost={handleClickOpen} />
     })
-    if(!idUserNull)
+    if(idUserNull)
     {
  return(
        
