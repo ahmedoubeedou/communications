@@ -26,7 +26,7 @@ export default function Cards({id ,profil_image , body , useNam , coment , srcs 
     // ==================== comments ui ===============================
     let uiComments = comments.map((elment)=>{
         return  <Stack key={uuidv4()} direction="row" spacing={7} sx={{alignItems:"center" ,flexGrow:1,display:"flex" , margin:"10px"}}>
-      <Avatar alt={elment.author.username != "" ?elment.author.username[0].toUpperCase():"a"} src = {elment.author.profile_image}  /> <br/>
+      <Avatar alt={elment.author.username != "" ?elment.author.username[0].toUpperCase():"a"} src = {elment.author?.profile_image || "non-photo.png"}  /> <br/>
       <Typography variant='subtitle1' sx={{fontSize:"16px"}}>{elment.body}</Typography>
     </Stack>
     })

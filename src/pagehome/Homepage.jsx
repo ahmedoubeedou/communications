@@ -27,22 +27,23 @@ import TextField from '@mui/material/TextField';
 import DialogTitle from '@mui/material/DialogTitle';
 // ======================== fin Dialog ==================
 //=============== hooks =====================================
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useReducer} from 'react';
 //=============== hooks =====================================
 //================== piblitique =================================
 import { v4 as uuidv4 } from "uuid";
 import axios from 'axios';
 import { Typography } from '@mui/material';
-import { Token } from '@mui/icons-material';
 // import { ConstructionOutlined } from '@mui/icons-material';
 //================== piblitique ================================
-
-
+// ======================= reducer ================================
+import reducer from '../reducers/homeReducer';
+// ======================== reducer ================================
 export default function Homepage({ getInformation }) {
   const elment = useRef(null);
   const [isData, setIsData] = useState(false);
   const [numberPage, setNumberPage] = useState(1);
-  const [posts, setPost] = useState([]);
+  // const [posts, setPost] = useState([]);
+  const [posts , dispatch] = useReducer(reducer, []);
   const [openDialog, setopenDialog] = useState(false)
   const [loading, setLoading] = useState(true);
   const [status , setStatus] = useState(false);
@@ -87,7 +88,7 @@ function handleClose(){
           if (!isActive) return;
           if (resp.data.data.length > 0) {
             
-            setPost((po) => [...po, ...resp.data.data])
+            dispatch({ type: "getAllPosts", payload: {data:resp.data.data} });
             setIsData(true);
           }
           else {
@@ -152,9 +153,8 @@ function handleClose(){
     axios.delete(`https://tarmeezacademy.com/api/v1/posts/${idPost}` , {
       headers: {
         "Authorization": `Bearer ${token}`  
-  } }).then((res)=>{
-    let postFilter = posts.filter((el)=>el.id !== idPost)
-    setPost(postFilter);
+  } }).then(()=>{
+ dispatch({ type: "delatePost", payload: {idPost : idPost} });
     setStatus(true);
     setOpenSnackbar(true);
     }).catch((error)=>{
@@ -185,11 +185,9 @@ function handleClose(){
       ([entry]) => {
         if (isData && entry.isIntersecting && !loading) {
           setNumberPage((n) => n + 1);
+         
         }
-
-        else {
-          // console.log("lll");
-        }
+        
 
       }
     )
@@ -202,8 +200,11 @@ function handleClose(){
 }, [isData, loading])
   // ========================= ui  get Post  =======================================
   let post = posts.map((el) => {
-    
-    return  <Cards key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={el.image} delatePost={handleOpenSuprimer} />
+    const imageUrl = typeof el.image === 'string' ? el.image : null; 
+  
+  // 2. Sécuriser l'avatar de l'auteur
+  const avatarUrl = typeof el.author.profile_image === 'string' ? el.author.profile_image : null;
+    return  <Cards key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={avatarUrl} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={imageUrl} delatePost={handleOpenSuprimer} />
   })
   // je essaie de faire une page unique pour update post et showPost  state={"showPost"}
   // ========================= ui  get Post =======================================
@@ -221,7 +222,7 @@ function handleClose(){
               <Button size="small" className='ml-2 login-class ' sx={token === "" ? { display: "block" } : { display: "none" }} onClick={handleOpenDialog}> Login</Button>
               <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? { display: "block" } : { display: "none" }}>Register</Button></Link>
               <Stack direction="row" spacing={0.1} sx={token !== "" ? { alignItems: "center", flexGrow: 1, display: "flex" } : { display: "none" }}>
-                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"} src={userInformation.profile_image} />
+                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"} src={userInformation?.profile_image || "non-photo.png" } />
                 <Typography variant='subtitle1' sx={{ fontSize: "16px" }}>{userInformation.username.length > 5 ? userInformation.username.slice(0, 5) : userInformation.username}</Typography>
               </Stack>
               <Button size="small" sx={token !== "" ? { border: "1px solid blue", paddingLeft: 0.3, paddingRight: 0.3, display: "block" } : { display: "none" }} onClick={logout} className='logout' >Logout</Button>
@@ -242,7 +243,6 @@ function handleClose(){
         <Dialog open={openDialog} onClose={handleCloseDialog} disableRestoreFocus>
           <DialogTitle className='text-center' >Login</DialogTitle>
           <DialogContent>
-
             <TextField
               autoFocus
               required
