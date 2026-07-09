@@ -31,13 +31,15 @@ import { useEffect, useRef, useState , useReducer} from 'react';
 //=============== hooks =====================================
 //================== piblitique =================================
 import { v4 as uuidv4 } from "uuid";
-import axios from 'axios';
 import { Typography } from '@mui/material';
 // import { ConstructionOutlined } from '@mui/icons-material';
 //================== piblitique ================================
 // ======================= reducer ================================
 import reducer from '../reducers/homeReducer';
 // ======================== reducer ================================
+// ========================= service ==========================
+import {Login , Lougout , DelatePoste , AllPosts}  from '../service/api';
+// ========================= service ==========================
 export default function Homepage({ getInformation }) {
   const elment = useRef(null);
   const [isData, setIsData] = useState(false);
@@ -53,10 +55,20 @@ export default function Homepage({ getInformation }) {
   const [userInformation, setUerInformation] = useState(() => {
     try {
       const userinfor = localStorage.getItem("user");
-      return userinfor ? JSON.parse(userinfor) : { username: "", profile_image: "" };
+      if (userinfor) {
+        let correctionProfeilImge = JSON.parse(userinfor);
+        if (typeof correctionProfeilImge.profile_image !== 'string') {
+          correctionProfeilImge.profile_image = "/public/pasDeprofile.png";
+        }
+        return correctionProfeilImge;
+      }else{
+        return { username: "", profile_image: "/public/pasDeprofile.png" };
+      }   
+    
+       
     } catch (er) {
       console.error(er)
-      return { username: "", profile_image: "" };
+      return { username: "", profile_image: "/public/pasDeprofile.png" };
     }
   })
    const profielLink = `/profile/`+userInformation.id;
@@ -79,12 +91,13 @@ function handleClose(){
 // ====================== close dialog ==========================
   // ========================= utilisation Useefect pour get Post =======================================
 
-  useEffect(() => {
+  useEffect(()=>{
     let isActive = true; 
     setLoading(true);
+    async function amenerTousPosts()
+    {  
     try {
-      axios.get(`https://tarmeezacademy.com/api/v1/posts?page=${numberPage}`)
-        .then((resp) => {
+    let resp =  await AllPosts(numberPage);
           if (!isActive) return;
           if (resp.data.data.length > 0) {
             
@@ -95,10 +108,11 @@ function handleClose(){
             setIsData(false);
           }
           setLoading(false);
-        })
-    } catch (erorr) {
+        } catch (erorr) {
       console.error(erorr)
     }
+    }
+     amenerTousPosts();
  return () => {
     isActive = false;
   };
@@ -108,60 +122,46 @@ function handleClose(){
   function handleCloseDialog() {
     setopenDialog(false)
   }
-  function handleOpenDialog() {
-    
+  function handleOpenDialog() {   
     setopenDialog(true);
   }
 
   // ==================== fin logique Dialog ===============
   // ================== debut Login ====================
-  function LoginCount() {
-    // console.log(informationLogin.use , informationLogin.pasw);
+  async function LoginCount() {
     try {
-      axios.post("https://tarmeezacademy.com/api/v1/login",
-        {
-          "username": informationLogin.use,
-          "password": informationLogin.pasw
-        }).then((response) => {
-          // console.log(response)
-          localStorage.setItem("token", response.data.token)
-          localStorage.setItem("user", JSON.stringify(response.data.user))
+      let response = await Login(informationLogin.use , informationLogin.pasw)
           setToken(response.data.token)
           getInformation(response.data.token);
           setUerInformation(response.data.user);
-          // console.log(response.data)
           setInformationLogin({ use: "", pasw: "" })
-        })
     } catch (erore) {
       console.error(erore)
     }
     setopenDialog(false)
   }
-
   // ================== fin Login ====================
   // =================== Lougout ========================
   function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  Lougout();
     setToken("");
   }
   // =================== Lougout ========================
   // =============== logique pour suprimer post =========================
   // ================= delate ===========================
-   function delatePost()
+   async function delatePost()
   {
-    axios.delete(`https://tarmeezacademy.com/api/v1/posts/${idPost}` , {
-      headers: {
-        "Authorization": `Bearer ${token}`  
-  } }).then(()=>{
+   try{
+    let response = await DelatePoste(idPost , token)
  dispatch({ type: "delatePost", payload: {idPost : idPost} });
-    setStatus(true);
+    setStatus(response);
     setOpenSnackbar(true);
-    }).catch((error)=>{
+    }
+    catch(error){
       console.error(error);
       setStatus(false);
       setOpenSnackbar(true);
-    })
+    }
   }
   // ================= delate ===========================
   function handleCloseSuprimer()
@@ -179,30 +179,22 @@ function handleClose(){
     setOpenDialogSuprimer(false);
   }
   // ============== logique pour suprimer post =========================
-  
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (isData && entry.isIntersecting && !loading) {
-          setNumberPage((n) => n + 1);
-         
+          setNumberPage((n) => n + 1);       
         }
-        
-
       }
     )
     if (elment.current) {
       observer.observe(elment.current);
-      // console.log("=== form derinier ==")
     }
-    // console.log("===================");
     return () => observer.disconnect();
 }, [isData, loading])
   // ========================= ui  get Post  =======================================
   let post = posts.map((el) => {
     const imageUrl = typeof el.image === 'string' ? el.image : null; 
-  
-  // 2. Sécuriser l'avatar de l'auteur
   const avatarUrl = typeof el.author.profile_image === 'string' ? el.author.profile_image : null;
     return  <Cards key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={avatarUrl} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={imageUrl} delatePost={handleOpenSuprimer} />
   })
@@ -222,7 +214,8 @@ function handleClose(){
               <Button size="small" className='ml-2 login-class ' sx={token === "" ? { display: "block" } : { display: "none" }} onClick={handleOpenDialog}> Login</Button>
               <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? { display: "block" } : { display: "none" }}>Register</Button></Link>
               <Stack direction="row" spacing={0.1} sx={token !== "" ? { alignItems: "center", flexGrow: 1, display: "flex" } : { display: "none" }}>
-                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"} src={userInformation?.profile_image || "non-photo.png" } />
+                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"}  />
+
                 <Typography variant='subtitle1' sx={{ fontSize: "16px" }}>{userInformation.username.length > 5 ? userInformation.username.slice(0, 5) : userInformation.username}</Typography>
               </Stack>
               <Button size="small" sx={token !== "" ? { border: "1px solid blue", paddingLeft: 0.3, paddingRight: 0.3, display: "block" } : { display: "none" }} onClick={logout} className='logout' >Logout</Button>

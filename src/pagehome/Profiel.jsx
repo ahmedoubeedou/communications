@@ -1,20 +1,20 @@
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import { useParams , Link } from "react-router-dom";
-import { useEffect, useState  } from "react";
+import { useEffect, useState , useContext } from "react";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import axios from "axios";
 import Snackbar from '@mui/material/Snackbar';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-
+import { information } from "../context/Userinformation";
 import Button from '@mui/material/Button';
 import "./page.css";
 import Card from "./Cards";
 import { v4 as uuidv4 } from "uuid";
 import Alert from '@mui/material/Alert';
+import {DelatePoste , getUserPostsApi , getUser}  from '../service/api';
 export default function Profiel()
 {
     const { idUser } = useParams();
@@ -25,20 +25,21 @@ export default function Profiel()
     const [status , setStatus] = useState(false);
     const [idPost , setIdPost] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
-    function delatePost(id)
+    const token = useContext(information)
+
+   async function delatePost(id)
   {
-    axios.delete(`https://tarmeezacademy.com/api/v1/posts/${id}` , {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`  
-  } }).then((res)=>{
-    console.log(res);
-    setStatus(true);
-    setOpenSnackbar(true);
-    }).catch((error)=>{
-      console.error(error);
-      setStatus(false);
+    try{
+        let response = await DelatePoste(id , token);
+       setStatus(response);
+         setOpenSnackbar(true);
+    } 
+    catch(erore)
+    {
+      console.error(erore)
+        setStatus(false);
       setOpenSnackbar(true);
-    })
+    }
   }
   function handleCloseSuprimer() {
     delatePost(idPost);
@@ -54,28 +55,30 @@ export default function Profiel()
   function handleCloseDialog() {
     setOpen(false);
   }
-     function getUserPosts()
+    async function getUserPosts()
     {
-        
-         axios.get(`https://tarmeezacademy.com/api/v1/users/${idUser}/posts`)
-        .then((res)=>{
-            setUserPosts(res.data.data)
-            setIdUserNull(true)
-        }).catch((error)=>{
-            console.error(error);
-            setIdUserNull(false)
-        })
+      try{
+ let response = await getUserPostsApi(idUser);
+      setUserPosts(response.data.data)
+      setIdUserNull(true)
+      }  catch(error)
+      {
+     console.error(error);
+      }
     }
      useEffect(()=>{
-          axios.get(`https://tarmeezacademy.com/api/v1/users/${idUser}`)
-            .then((res)=>{
-                
-                setUserInformation(res.data.data)
+      async function getUserPost()
+      {
+        try{     
+        let response = await getUser(idUser)
+                setUserInformation(response.data.data)
                 getUserPosts();
-            }).catch((error)=>{
+           } catch(error){
                 console.error(error);
                 setIdUserNull(true)
-            })
+            }
+             }
+             getUserPost();
     },[status])  
     let userPost = userPosts.map((el)=>{
            return  <Card  key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={el.author.profile_image} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={el.image} delatePost={handleClickOpen} />
@@ -126,7 +129,7 @@ export default function Profiel()
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} autoFocus>
+          <Button onClick={handleCloseDialog}>
             Annuler
           </Button>
           <Button onClick={handleCloseSuprimer} sx={{color:"red"}}>Suprimer</Button>

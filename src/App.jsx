@@ -14,7 +14,13 @@ import RegisterPage from "./pagehome/Register";
 import Profiel from "./pagehome/Profiel";
 // ===================== Pibliotique ===================
 function App() {
-  const [token , setToken ] = useState("")
+  const [token , setToken ] = useState(()=>{
+  if(localStorage.getItem("token") === null){
+   return "";
+    }else{
+      return localStorage.getItem("token");
+    }
+  })
   // ============ userInformation================
   function getInformation(token)
   {
@@ -23,15 +29,17 @@ function App() {
   // ============ userInformation================
   return (
     <>
+    <information.Provider value={token}>
     <Routes>
-      <Route path="/" element={<information.Provider value={token}><Homepage getInformation={getInformation}/></information.Provider>} />
+
+      <Route path="/" element={<Homepage getInformation={getInformation}/>} />
       <Route path="/register" element={<RegisterPage/>} />
       <Route path="/createpost" element={<CreatePost/>}/>
       <Route path="/Showpost/:idPost" element={<Showpost/>} />
       <Route path="/profile/:idUser" element={<Profiel/>} />
       <Route path="*" element={<NotFound/>}/>
       </Routes>
-     
+     </information.Provider>
    </>
   )
 }

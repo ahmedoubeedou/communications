@@ -102,7 +102,7 @@ handleClose();
 
     return(
     <>
-     <Container maxWidth="sm" sx={{background:"#123" ,padding:"20px", height:"100vh", display:"flex", justifyContent:"center", alignItems:"center" , overflow:"hidden"}}>
+     <Container maxWidth="sm" sx={{background:"#123" ,padding:"20px", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center" , overflow:"hidden"}}>
        <Container maxWidth="sm" sx={{background:"#eeeeee" , minHeight:"300px" , borderRadius:"20px",padding:"20px", display:"flex",gap:"2px",flexDirection:"column", justifyContent:"space-around", alignItems:"center"}}> 
            <Typography variant='h4' className='text-center text-black grow-2 flex items-center justify-center'>Cree votre Post</Typography>
            <div className='flex flex-col gap-4 w-[80%]grow-2 justify-around '>
