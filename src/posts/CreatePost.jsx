@@ -19,7 +19,7 @@ import {CreatePostApi} from "../service/api";
 export default function CreatePost()
 {
     
-    const token = useContext(information)
+    const {token,user} = useContext(information)
     const changeInputvalue = useRef(null)
     const [srcs , setSrcs ] = useState("/");
     const [shoisephoto , setShoisephoto ] = useState(false);
@@ -32,9 +32,7 @@ export default function CreatePost()
     {
          setSrcs(URL.createObjectURL(event.target.files[0]))
          setShoisephoto(true);
-         setPostInformation({...postInformation , ImgeUrl:event.target.files[0]})
-        //    console.log(event.target.files[0])
-           
+         setPostInformation({...postInformation , ImgeUrl:event.target.files[0]})        
     }
       function updateuiphoto()
     {

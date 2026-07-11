@@ -6,6 +6,7 @@ import Showpost from "./posts/Showpost";
 //================ user Information ====================================
 import { information } from "./context/Userinformation";
 import { useState } from "react";
+import {pasDeProfiel} from "./constants/constants"
 //================ user Information ====================================
 // ===================== Pibliotique ===================
 import { Route , Routes  } from "react-router-dom";
@@ -14,26 +15,38 @@ import RegisterPage from "./pagehome/Register";
 import Profiel from "./pagehome/Profiel";
 // ===================== Pibliotique ===================
 function App() {
-  const [token , setToken ] = useState(()=>{
-  if(localStorage.getItem("token") === null){
-   return "";
-    }else{
-      return localStorage.getItem("token");
+  const [userInformation , setUserInformation] = useState(()=>{
+    let token = "";
+    let user =  { username: "", profile_image: pasDeProfiel };
+  if(localStorage.getItem("token") !== null){
+  token = localStorage.getItem("token");
     }
-  })
+       const userinfor = localStorage.getItem("user");
+          if (userinfor) {
+            let correctionProfeilImge = JSON.parse(userinfor);       
+            if (typeof correctionProfeilImge.profile_image  !== 'string') {
+              correctionProfeilImge.profile_image = pasDeProfiel;
+            }
+            user = correctionProfeilImge;
+            
+          }
+          return {token , user}
+      })
   // ============ userInformation================
-  function getInformation(token)
+  function getInformation(token , user)
   {
-    setToken(token)
+   let userinfo = {token ,  user};
+
+    setUserInformation(userinfo)
   }
   // ============ userInformation================
   return (
     <>
-    <information.Provider value={token}>
+    <information.Provider value={userInformation}>
     <Routes>
 
       <Route path="/" element={<Homepage getInformation={getInformation}/>} />
-      <Route path="/register" element={<RegisterPage/>} />
+      <Route path="/register" element={<RegisterPage  getInformation={getInformation}/>} />
       <Route path="/createpost" element={<CreatePost/>}/>
       <Route path="/Showpost/:idPost" element={<Showpost/>} />
       <Route path="/profile/:idUser" element={<Profiel/>} />

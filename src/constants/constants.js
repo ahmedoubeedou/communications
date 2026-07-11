@@ -1,0 +1,1 @@
+export const pasDeProfiel = import.meta.env.BASE_URL+"p.png";

@@ -99,9 +99,10 @@ export async function EnvoyerInformation(urlProfiel , username , password , name
 
     formDat.append("name",name)
     formDat.append("email",email)
- let resp =  await      axios.post("https://tarmeezacademy.com/api/v1/register",
+ let response =  await axios.post("https://tarmeezacademy.com/api/v1/register",
        formDat
        )
-        localStorage.setItem("token",resp.data.token)
-        localStorage.setItem("user",JSON.stringify(resp.data.user));
+        localStorage.setItem("token",response.data.token)
+        localStorage.setItem("user",JSON.stringify(response.data.user));
+      return response;
 }

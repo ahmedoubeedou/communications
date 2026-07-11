@@ -12,7 +12,7 @@ import { information } from "../context/Userinformation";
 import {getPostUser , CreateComentaire , UpdatePost} from "../service/api";
 export default function Showpost()
 {
-    const token = useContext(information);
+    const {token, user} = useContext(information);
     const {idPost} = useParams()
     const informationPost  = useLocation();
     const ShowOrUpdate = informationPost.state;

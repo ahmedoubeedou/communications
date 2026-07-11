@@ -25,7 +25,7 @@ export default function Profiel()
     const [status , setStatus] = useState(false);
     const [idPost , setIdPost] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
-    const token = useContext(information)
+    const {token,user} = useContext(information)
 
    async function delatePost(id)
   {

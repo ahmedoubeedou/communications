@@ -13,9 +13,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import { information } from "../context/Userinformation";
+import {pasDeProfiel} from "../constants/constants";
 // ============================================== appBar  ====================================== 
 // ================= photo utilisateur =========================
-
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 // ================= photo utilisateur =========================
@@ -27,12 +28,11 @@ import TextField from '@mui/material/TextField';
 import DialogTitle from '@mui/material/DialogTitle';
 // ======================== fin Dialog ==================
 //=============== hooks =====================================
-import { useEffect, useRef, useState , useReducer} from 'react';
+import { useEffect, useRef, useState , useReducer , useContext} from 'react';
 //=============== hooks =====================================
 //================== piblitique =================================
 import { v4 as uuidv4 } from "uuid";
 import { Typography } from '@mui/material';
-// import { ConstructionOutlined } from '@mui/icons-material';
 //================== piblitique ================================
 // ======================= reducer ================================
 import reducer from '../reducers/homeReducer';
@@ -41,10 +41,12 @@ import reducer from '../reducers/homeReducer';
 import {Login , Lougout , DelatePoste , AllPosts}  from '../service/api';
 // ========================= service ==========================
 export default function Homepage({ getInformation }) {
+    // ==================== Debut contxet ================================
+  const {token , user}  = useContext(information)
+  // ==================== Fin contxet ================================
   const elment = useRef(null);
   const [isData, setIsData] = useState(false);
   const [numberPage, setNumberPage] = useState(1);
-  // const [posts, setPost] = useState([]);
   const [posts , dispatch] = useReducer(reducer, []);
   const [openDialog, setopenDialog] = useState(false)
   const [loading, setLoading] = useState(true);
@@ -52,34 +54,12 @@ export default function Homepage({ getInformation }) {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openDialogSuprimer, setOpenDialogSuprimer] = useState(false);
   const [idPost, setIdPost] = useState(null);
-  const [userInformation, setUerInformation] = useState(() => {
-    try {
-      const userinfor = localStorage.getItem("user");
-      if (userinfor) {
-        let correctionProfeilImge = JSON.parse(userinfor);       
-        if (typeof correctionProfeilImge.profile_image !== 'string') {
-          console.log("the type of homepage : "+typeof correctionProfeilImge.profile_image)
-          correctionProfeilImge.profile_image = "/public/pasDeprofile.png";
-        }
-        return correctionProfeilImge;
-      }else{
-        return { username: "", profile_image: "/public/pasDeprofile.png" };
-      }   
-    
-       
-    } catch (er) {
-      console.error(er)
-      return { username: "", profile_image: "/public/pasDeprofile.png" };
-    }
-  })
-   const profielLink = `/profile/`+userInformation.id;
+   const profielLink = `/profile/`+user.id;
   const [informationLogin, setInformationLogin] = useState({
     use: "test4316",
     pasw: "token43"
   })
-  // ==================== Debut getTokenLocalStorage ================================
-  const [token, setToken] = useState(localStorage.getItem("token") === null ? "" : localStorage.getItem("token"))
-  // ==================== Fin getTokenLocalStorage ================================
+
 // ====================== close snackbar ==========================
 function handleClose(){
     setOpenSnackbar(false);
@@ -91,7 +71,6 @@ function handleClose(){
   }
 // ====================== close dialog ==========================
   // ========================= utilisation Useefect pour get Post =======================================
-
   useEffect(()=>{
     let isActive = true; 
     setLoading(true);
@@ -120,21 +99,15 @@ function handleClose(){
   }, [numberPage])
   // ========================= utilisation Useefect pour get Post =======================================
   // ==================== debut logique Dialog ===============
-  function handleCloseDialog() {
-    setopenDialog(false)
-  }
   function handleOpenDialog() {   
     setopenDialog(true);
   }
-
   // ==================== fin logique Dialog ===============
   // ================== debut Login ====================
   async function LoginCount() {
     try {
       let response = await Login(informationLogin.use , informationLogin.pasw)
-          setToken(response.data.token)
-          getInformation(response.data.token);
-          setUerInformation(response.data.user);
+          getInformation(response.data.token , response.data.user);        
           setInformationLogin({ use: "", pasw: "" })
     } catch (erore) {
       console.error(erore)
@@ -145,7 +118,7 @@ function handleClose(){
   // =================== Lougout ========================
   function logout() {
   Lougout();
-    setToken("");
+  getInformation("" , { username: "", profile_image: pasDeProfiel });
   }
   // =================== Lougout ========================
   // =============== logique pour suprimer post =========================
@@ -197,7 +170,7 @@ function handleClose(){
   let post = posts.map((el) => {
     const imageUrl = typeof el.image === 'string' ? el.image : null; 
   const avatarUrl = typeof el.author.profile_image === 'string' ? el.author.profile_image : null;
-    return  <Cards key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={avatarUrl} tages={el.tags} isUser={userInformation.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={imageUrl} delatePost={handleOpenSuprimer} />
+    return  <Cards key={uuidv4()} body={el.body} id={el.id} created_at={el.created_at} profil_image={avatarUrl} tages={el.tags} isUser={user.email === el.author.email} useNam={el.author.username} coment={el.comments_count} srcs={imageUrl} delatePost={handleOpenSuprimer} />
   })
   // je essaie de faire une page unique pour update post et showPost  state={"showPost"}
   // ========================= ui  get Post =======================================
@@ -215,9 +188,8 @@ function handleClose(){
               <Button size="small" className='ml-2 login-class ' sx={token === "" ? { display: "block" } : { display: "none" }} onClick={handleOpenDialog}> Login</Button>
               <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? { display: "block" } : { display: "none" }}>Register</Button></Link>
               <Stack direction="row" spacing={0.1} sx={token !== "" ? { alignItems: "center", flexGrow: 1, display: "flex" } : { display: "none" }}>
-                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"} src={userInformation.profile_image} />
-
-                <Typography variant='subtitle1' sx={{ fontSize: "16px" }}>{userInformation.username.length > 5 ? userInformation.username.slice(0, 5) : userInformation.username}</Typography>
+                <Avatar alt={user.username != "" ? user.username[0].toUpperCase() : "a"} src={user.profile_image} />
+                <Typography variant='subtitle1' sx={{ fontSize: "16px" }}>{user.username.length > 5 ? user.username.slice(0, 5) : user.username}</Typography>
               </Stack>
               <Button size="small" sx={token !== "" ? { border: "1px solid blue", paddingLeft: 0.3, paddingRight: 0.3, display: "block" } : { display: "none" }} onClick={logout} className='logout' >Logout</Button>
 
@@ -256,7 +228,6 @@ function handleClose(){
               value={informationLogin.use}
               onChange={(e) => { setInformationLogin({ ...informationLogin, use: e.target.value }) }}
             />
-
             <TextField
               autoFocus
               required

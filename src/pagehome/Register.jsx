@@ -42,7 +42,7 @@ const FIELD_SX = {
   "& .MuiFormHelperText-root": { fontSize: "12px", ml: "2px" },
   "& .MuiInputAdornment-root svg": { fontSize: "19px", color: "#475569" },
 };
-export default function RegisterPage() {
+export default function RegisterPage({getInformation}) {
   const [form, setForm] = useState({ name: "", email: "", username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);
@@ -148,7 +148,8 @@ const [preview, setPreview] = useState(null);
 async function envoyerInformation()
 {
   try{
-   await EnvoyerInformation(urlProfiel , form.username , form.password , form.name , form.email)
+  const response = await EnvoyerInformation(urlProfiel , form.username , form.password , form.name , form.email)
+       getInformation(response.data.token , response.data.user);
         setEntrer(true);
   }
   catch(error){
@@ -179,7 +180,7 @@ setSuccess(false)
  
           {/* Success badge */}
           <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-black text-xs font-medium px-3 py-1.5 rounded-full">
-            {/* <CheckCircleOutlineIcon sx={{ fontSize: 14 }} /> */}
+            
             Compte activé
           </div>
  
