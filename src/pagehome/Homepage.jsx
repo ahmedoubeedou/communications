@@ -56,8 +56,9 @@ export default function Homepage({ getInformation }) {
     try {
       const userinfor = localStorage.getItem("user");
       if (userinfor) {
-        let correctionProfeilImge = JSON.parse(userinfor);
+        let correctionProfeilImge = JSON.parse(userinfor);       
         if (typeof correctionProfeilImge.profile_image !== 'string') {
+          console.log("the type of homepage : "+typeof correctionProfeilImge.profile_image)
           correctionProfeilImge.profile_image = "/public/pasDeprofile.png";
         }
         return correctionProfeilImge;
@@ -214,7 +215,7 @@ function handleClose(){
               <Button size="small" className='ml-2 login-class ' sx={token === "" ? { display: "block" } : { display: "none" }} onClick={handleOpenDialog}> Login</Button>
               <Link to="/register"> <Button size="small" className='ml-2 login-class' sx={token === "" ? { display: "block" } : { display: "none" }}>Register</Button></Link>
               <Stack direction="row" spacing={0.1} sx={token !== "" ? { alignItems: "center", flexGrow: 1, display: "flex" } : { display: "none" }}>
-                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"}  />
+                <Avatar alt={userInformation.username != "" ? userInformation.username[0].toUpperCase() : "a"} src={userInformation.profile_image} />
 
                 <Typography variant='subtitle1' sx={{ fontSize: "16px" }}>{userInformation.username.length > 5 ? userInformation.username.slice(0, 5) : userInformation.username}</Typography>
               </Stack>

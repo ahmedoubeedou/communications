@@ -87,10 +87,10 @@ export default function Profiel()
     {
  return(
        
-        <Container maxWidth="sm" sx={{ display: "flex", flexDirection: "column" , background: "radial-gradient(circle,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 62%, rgba(0, 212, 255, 1) 95%)", alignItems: "center",minHeight: "100vh" }}>
+        <Container maxWidth="sm" sx={{ display: "flex", flexDirection: "column" , background: "#123", alignItems: "center",minHeight: "100vh" }}>
             <h2 className='text-3xl text-white m-3  p-3' >Bienvenue {userInformation.username}</h2>
             <Stack direction="row" spacing={2} sx={{width:"98%" , height:"160px" , justifyContent:"space-between", alignItems:"center", padding:"1px 10px"}} >
-<img src={userInformation?.profile_image} alt="None" className='image-profile'/>
+<img src={userInformation?.profile_image} alt="Non img" className='image-profile text-white text-center text-[12px]'/>
 <div>
     <p className='text-white'> <span className='font-bold'>userNom</span> : {userInformation.username}</p>
     <p className='text-white'><span className='font-bold'>Nom</span> : {userInformation.name}</p>
@@ -141,7 +141,7 @@ export default function Profiel()
     }
     else{
         return (
-               <Container maxWidth="sm" sx={{ display: "flex", flexDirection: "column" , background: "radial-gradient(circle,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 62%, rgba(0, 212, 255, 1) 95%)", alignItems: "center",height: "100vh" }}>
+               <Container maxWidth="sm" sx={{ display: "flex", flexDirection: "column" , background: "#123", alignItems: "center",height: "100vh" }}>
             <h2 className='text-3xl text-white m-3  p-3' >Cette ID n'existe pas</h2>
            
        

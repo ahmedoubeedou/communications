@@ -3,14 +3,16 @@ import Card from "../pagehome/Cards";
 import { Button, Container } from "@mui/material";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import "./post.css";
-import { useEffect, useState  } from "react";
+import { useContext, useEffect, useState  } from "react";
 import Fab from '@mui/material/Fab';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import TextField from '@mui/material/TextField';
-import axios from "axios";
+import { information } from "../context/Userinformation";
+import {getPostUser , CreateComentaire , UpdatePost} from "../service/api";
 export default function Showpost()
 {
+    const token = useContext(information);
     const {idPost} = useParams()
     const informationPost  = useLocation();
     const ShowOrUpdate = informationPost.state;
@@ -25,51 +27,40 @@ tags:[],author:{
     }})
     // ====================== GET posts avec leur donner ===================================
     useEffect(()=>{
-                
-                    axios.get(`https://tarmeezacademy.com/api/v1/posts/${idPost}`)
-                  .then((res)=>{
- setPostInformation(res.data.data)
- 
-                  }).catch((error)=>{      
-  console.error("=== zE"+error);
+        async function getPostUserId()
+        {
+try{
+const response = await getPostUser(idPost);
+ setPostInformation(response.data.data)
+                  }catch(error){  
+  console.error(error);
   setIdPostNull(true)
-                  })
-              
+                  }
+        }
+        getPostUserId();
             },[comentaireAjouter])
     // ====================== GET posts avec leur donner ===================================
 // ================================ Create comentaire =================================
 async function createComentaire()
 {
-    const token = localStorage.getItem("token")
-    const headr = {
-        "Authorization":`Bearer ${token}`,
-      
-    }
-   await  axios.post(`https://tarmeezacademy.com/api/v1/posts/${idPost}/comments` , 
-        {
-    "body": bodyComantaire
-}, {headers:headr}
-).catch((error)=>{
+try{
+await CreateComentaire(bodyComantaire , token , idPost);
+}
+catch(error){
     console.error(error);
-})
-
+}
 setEcrireComantaire(false)
 setComentaireAjouter(true);
 }
 // ================================ Create comentaire =================================
 // ================= update Post ==========================================
 async function updatePost(){
-    const token = localStorage.getItem("token")
-    const headr = {
-        "Authorization":`Bearer ${token}`  , 
-    }
-   await  axios.put(`https://tarmeezacademy.com/api/v1/posts/${idPost}` , 
-        {
-    "body": bodyComantaire
-}, {headers:headr}
-).catch((error)=>{
+   try{
+    await UpdatePost(idPost , bodyComantaire , token)
+   }
+catch(error){
     console.error(error);
-})
+}
 setEcrireComantaire(false)
 setComentaireAjouter(true);
 }

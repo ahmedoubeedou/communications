@@ -14,7 +14,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import Alert from '@mui/material/Alert';
 import { Link } from "react-router-dom";
-import axios from "axios";
+import {EnvoyerInformation} from "../service/api"
 function getStrength(pwd) {
   if (!pwd) return 0;
   let s = 0;
@@ -147,28 +147,11 @@ const [preview, setPreview] = useState(null);
 //===================== logique =========================
 async function envoyerInformation()
 {
-  console.log(form);
   try{
-    let formDat = new FormData()
-    formDat.append("username",form.username)
-    formDat.append("password",form.password)
-    if(urlProfiel)
-    {
-    formDat.append("image",urlProfiel)
-    }
-
-    formDat.append("name",form.name)
-    formDat.append("email",form.email)
- let resp =  await      axios.post("https://tarmeezacademy.com/api/v1/register",
-       formDat
-       )
-        console.log(resp)
-        localStorage.setItem("token",resp.data.token)
-        localStorage.setItem("user",JSON.stringify(resp.data.user));
+   await EnvoyerInformation(urlProfiel , form.username , form.password , form.name , form.email)
         setEntrer(true);
   }
   catch(error){
-
     if (error.response) {
       
       console.error("Détails de l'erreur de validation :", error.response.data);
@@ -180,7 +163,6 @@ async function envoyerInformation()
     }
 setSuccess(false)
   }
-
 }
   /* ── Success screen ── */
   if (success) {

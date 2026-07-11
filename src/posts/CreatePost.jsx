@@ -10,15 +10,16 @@ import Alert from '@mui/material/Alert';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 // =================================== hoks ================================================
-import {  useRef, useState } from 'react';
+import {  useRef, useState , useContext } from 'react';
 // =================================== hoks ================================================
 import "./post.css";
-import axios from 'axios';
+import { information } from "../context/Userinformation";
 import { Link } from 'react-router-dom';
+import {CreatePostApi} from "../service/api";
 export default function CreatePost()
 {
     
-    // const [postInformation , setpost]
+    const token = useContext(information)
     const changeInputvalue = useRef(null)
     const [srcs , setSrcs ] = useState("/");
     const [shoisephoto , setShoisephoto ] = useState(false);
@@ -51,29 +52,12 @@ export default function CreatePost()
         // ================= request cree un post ======================================
 
     async function  createpost()
-    {
-        const formDatas = new FormData();
-        formDatas.append("body",postInformation.body)
-        formDatas.append("image",postInformation.ImgeUrl)
-        formDatas.append("title",postInformation.titel)
-        // console.log("=================="+)
-        const token = localStorage.getItem("token");
-        
-    //   console.log(postInformation)
-    const headr = {
-        "Authorization":`Bearer ${token}`,
-        "Content-Type":"multipart/form-data"
-    }
+    {  
     try{
- await axios.post("https://tarmeezacademy.com/api/v1/posts",
-         formDatas,{
-         headers:headr
-        }
-    )
+    await CreatePostApi(postInformation.body ,postInformation.ImgeUrl, postInformation.titel , token)
     updateuiphoto();
     setPostInformation({titel:"",body:"",ImgeUrl:{}})
     setMessageSnackBar("post cree");
-    // setOpenSnackBarr(true);
     }
     catch(eror){
           let apiMessage = "erure de configuration";
@@ -85,9 +69,6 @@ export default function CreatePost()
         {
                     apiMessage = "Essayer voter conexion";
         }
-        
-    //    console.error(eror.apiMessageponsee.data.message)
-
         setMessageSnackBar("post non cree "+apiMessage);
     }finally{
 setOpenSnackBarr(true);  
