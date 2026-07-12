@@ -1,4 +1,4 @@
-import { useState , useRef  } from "react";
+import { useState , useRef, useContext  } from "react";
 import {TextField,Button,CircularProgress, Divider} from "@mui/material";
 import {   HowToRegOutlined} from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -15,6 +15,7 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import Alert from '@mui/material/Alert';
 import { Link } from "react-router-dom";
 import {EnvoyerInformation} from "../service/api"
+import { information } from "../context/Userinformation";
 function getStrength(pwd) {
   if (!pwd) return 0;
   let s = 0;
@@ -42,7 +43,8 @@ const FIELD_SX = {
   "& .MuiFormHelperText-root": { fontSize: "12px", ml: "2px" },
   "& .MuiInputAdornment-root svg": { fontSize: "19px", color: "#475569" },
 };
-export default function RegisterPage({getInformation}) {
+export default function RegisterPage() {
+  const {userInformation , getInformation} = useContext(information);
   const [form, setForm] = useState({ name: "", email: "", username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);

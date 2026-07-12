@@ -40,9 +40,10 @@ import reducer from '../reducers/homeReducer';
 // ========================= service ==========================
 import {Login , Lougout , DelatePoste , AllPosts}  from '../service/api';
 // ========================= service ==========================
-export default function Homepage({ getInformation }) {
+export default function Homepage() {
     // ==================== Debut contxet ================================
-  const {token , user}  = useContext(information)
+  const {userInformation ,  getInformation}  = useContext(information)
+  const {token , user } = userInformation;
   // ==================== Fin contxet ================================
   const elment = useRef(null);
   const [isData, setIsData] = useState(false);
